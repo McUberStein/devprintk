@@ -64,7 +64,7 @@ int main(int argc, char **argv){
 
     for(int i = 1; i < argc; i++){
        while((str = strtokstr_r(argv[i], "\\n", &argv[i])) != NULL){
-        fprintf(dev, str);
+        fprintf(dev, "%s", str);
         fflush(dev);
       }
 }
