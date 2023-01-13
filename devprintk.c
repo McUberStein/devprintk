@@ -19,7 +19,8 @@ static ssize_t dev_read(struct file*, char*, size_t, loff_t*);
 static ssize_t dev_write(struct file*, const char*, size_t, loff_t*);
 
 static int init_stat;
-static int public = 0;
+static int public = 0660;
+static unsigned int device_permission = 0;
 static char message_buffer[MAX_DEVPRINTK_BUFFER];
 static struct class *cl;
 static struct cdev c_dev;
@@ -34,7 +35,9 @@ static struct file_operations ops = {
 };
 
 static int devprintk_uevent(struct device *dev, struct kobj_uevent_env *env){
-    add_uevent_var(env, "DEVMODE=%#o", 0777);
+    if(public == 1)
+        device_permission = 0777;
+    add_uevent_var(env, "DEVMODE=%#o", device_permission);
     return 0;
 }
 
@@ -75,10 +78,13 @@ static int __init devprintk_init(void){
             unregister_chrdev_region(dev, 1);
             return -1;
         }
+        if(public < 0)
+            public = 0;
         if(public > 0){
             public = 1;
-            cl->dev_uevent = devprintk_uevent;
+            device_permission = 0777;
         }
+        cl->dev_uevent = devprintk_uevent;
         if(device_create(cl, NULL, dev, NULL, DEVICE_NAME) == NULL){
             printk(KERN_ALERT "Device creation failed\n");
             class_destroy(cl);
@@ -113,5 +119,5 @@ module_exit(devprintk_exit);
 module_param(public, int, 0660);
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Me");
-MODULE_DESCRIPTION("Print with printk");
+MODULE_AUTHOR("McUberStein");
+MODULE_DESCRIPTION("Print with /dev/printk");
