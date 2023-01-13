@@ -19,8 +19,8 @@ static ssize_t dev_read(struct file*, char*, size_t, loff_t*);
 static ssize_t dev_write(struct file*, const char*, size_t, loff_t*);
 
 static int init_stat;
-static int public = 0660;
-static unsigned int device_permission = 0;
+static int public = 0;
+static unsigned int device_permission = 0660;
 static char message_buffer[MAX_DEVPRINTK_BUFFER];
 static struct class *cl;
 static struct cdev c_dev;
